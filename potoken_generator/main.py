@@ -1,10 +1,12 @@
 import argparse
 import asyncio
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import Optional
 
+import requests
 import nodriver
 
 from potoken_generator.extractor import PotokenExtractor, TokenInfo
@@ -22,6 +24,20 @@ def print_token_and_exit(token_info: Optional[TokenInfo]):
 
     print('visitor_data: ' + visitor_data)
     print('po_token: ' + po_token)
+    
+    url = os.getenv('LAVALINK_URL') + '/youtube'
+    payload = {
+        'visitorData': visitor_data,
+        'poToken': po_token
+    }
+    
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
+        logger.info('Data posted successfully. Response: %s', response.text)
+    except requests.RequestException as e:
+        logger.error('Failed to post data: %s', e)
+    
     if len(po_token) < 160:
         logger.warning("there is a high chance that the potoken generated won't work. Please try again on another internet connection")
         sys.exit(1)

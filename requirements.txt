@@ -1,3 +1,4 @@
 nodriver==0.32
 undetected-chromedriver==3.5.5
 websockets==13.1
+requests==2.32.3
