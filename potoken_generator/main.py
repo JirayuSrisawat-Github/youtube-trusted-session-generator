@@ -25,14 +25,26 @@ def print_token_and_exit(token_info: Optional[TokenInfo]):
     print('visitor_data: ' + visitor_data)
     print('po_token: ' + po_token)
     
-    url = os.getenv('LAVALINK_URL') + '/youtube'
+    lavalink_url = os.getenv('LAVALINK_URL')
+    if not lavalink_url:
+        raise ValueError("Environment variable LAVALINK_URL is not set")
+    
+    url = lavalink_url + '/youtube'
+    auth_token = os.getenv('AUTH_TOKEN')
+    if not auth_token:
+        raise ValueError("Environment variable AUTH_TOKEN is not set")
+    
+    headers = {
+        'Authorization': auth_token
+    }
+    
     payload = {
         'visitorData': visitor_data,
         'poToken': po_token
     }
     
     try:
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
         logger.info('Data posted successfully. Response: %s', response.text)
     except requests.RequestException as e:
